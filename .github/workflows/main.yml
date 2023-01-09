@@ -1,32 +1,3 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Codespaces
-Marketplace
-Explore
- 
-@arvinaik 
-IS458
-/
-alarm-handler
-Private
-Code
-Issues
-Pull requests
-Actions
-Projects
-Security
-Insights
-Settings
-alarm-handler/.github/workflows/main.yml
-@arvinaik
-arvinaik Remove role to assume from main.yml
-Latest commit 5e187fa on Oct 25, 2022
- History
- 1 contributor
-45 lines (43 sloc)  1.26 KB
-
 name: Deploy to Amazon Lambda
 
 on:
@@ -60,7 +31,7 @@ jobs:
         yarn install
     - name: Create zip archive
       run: |
-        zip -r function.zip .
+        zip -r function.zip ./dist
     - name: Deploy zip to lambda
       env:
         FUNCTION_ARN: ${{ secrets.FUNCTION_ARN }}
