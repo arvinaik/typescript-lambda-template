@@ -1,0 +1,68 @@
+Skip to content
+Search or jump to…
+Pull requests
+Issues
+Codespaces
+Marketplace
+Explore
+ 
+@arvinaik 
+IS458
+/
+alarm-handler
+Private
+Code
+Issues
+Pull requests
+Actions
+Projects
+Security
+Insights
+Settings
+alarm-handler/.github/workflows/main.yml
+@arvinaik
+arvinaik Remove role to assume from main.yml
+Latest commit 5e187fa on Oct 25, 2022
+ History
+ 1 contributor
+45 lines (43 sloc)  1.26 KB
+
+name: Deploy to Amazon Lambda
+
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-southeast-1
+        role-duration-seconds: 1200
+    - name: Install dependencies
+      run: |
+        yarn install
+    - name: Create zip archive
+      run: |
+        zip -r function.zip .
+    - name: Deploy zip to lambda
+      env:
+        FUNCTION_ARN: ${{ secrets.FUNCTION_ARN }}
+      run: |
+        aws lambda update-function-code --function-name ${FUNCTION_ARN} --zip-file fileb://function.zip
