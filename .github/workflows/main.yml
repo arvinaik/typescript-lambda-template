@@ -31,9 +31,9 @@ jobs:
       run: |
         yarn install
     - name: Compile typescript
-        continue-on-error: true
-        run: |
-          npx tsc
+      continue-on-error: true
+      run: |
+        npx tsc
     - name: Create zip archive
       run: |
         yarn install --production
