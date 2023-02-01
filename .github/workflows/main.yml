@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - "main"
-
+env:
+  FUNCTION_ARN: ${{ secrets.FUNCTION_ARN }}
 jobs:
   deploy:
     name: Deploy
@@ -29,11 +30,18 @@ jobs:
     - name: Install dependencies
       run: |
         yarn install
+    - name: Compile typescript
+        continue-on-error: true
+        run: |
+          npx tsc
     - name: Create zip archive
       run: |
-        zip -r function.zip ./dist
+        yarn install --production
+        cp -R node_modules dist/node_modules
+        cd ./dist && zip -r ../function.zip .
+    - name: Update lambda configuration
+      run: |
+        aws lambda update-function-configuration --function-name ${FUNCTION_ARN} --environment "Variables={FOO=${BAR},BAZ=${QUX}}"
     - name: Deploy zip to lambda
-      env:
-        FUNCTION_ARN: ${{ secrets.FUNCTION_ARN }}
       run: |
         aws lambda update-function-code --function-name ${FUNCTION_ARN} --zip-file fileb://function.zip
